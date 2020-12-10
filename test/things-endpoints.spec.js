@@ -41,7 +41,7 @@ describe('Things Endpoints', function() {
           db,
           testUsers,
           testThings,
-          testReviews,
+          testReviews
         )
       )
 
@@ -89,7 +89,7 @@ describe('Things Endpoints', function() {
   describe(`GET /api/things/:thing_id`, () => {
     context(`Given no things`, () => {
         beforeEach(() =>
-          db.into('thingful_users').insert(testUsers)
+        helpers.seedStuff(db, testUsers, 'users')
         );
       it(`responds with 404`, () => {
         const thingId = 123456
@@ -156,7 +156,7 @@ describe('Things Endpoints', function() {
   describe(`GET /api/things/:thing_id/reviews`, () => {
     context(`Given no things`, () => {
       beforeEach(() =>
-      db.into('thingful_users').insert(testUsers)
+      helpers.seedStuff(db, testUsers, 'users')
       );
       it(`responds with 404`, () => {
         const thingId = 123456
