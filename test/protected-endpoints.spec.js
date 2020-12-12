@@ -49,18 +49,19 @@ describe('Protected Endpoints', function() {
       );
       
       describe(endpoint.name, () => {
-        it('responds with 401 \'Missing basic token\' when no basic token', () => {
+        it('responds with 401 \'Missing bearer token\' when no bearer token', () => {
           return supertest(app)
             .get(endpoint.path)
-            .expect(401, { error: 'Missing basic token' });
+            .expect(401, { error: 'Missing bearer token' });
         });
       });
   
-      it('responds 401 \'Unauthorized request\' when no credentials in token', () => {
-        const userNoCreds = { user_name: '', password: '' };
+      it('responds 401 \'Unauthorized request\' when invalid JWT', () => {
+        const validUser = testUsers[0];
+        const badSecret = 'not-a-secret';
         return supertest(app)
           .get(endpoint.path)
-          .set('Authorization', makeAuthHeader(userNoCreds))
+          .set('Authorization', makeAuthHeader(validUser, badSecret))
           .expect(401, { error: 'Unauthorized request' });
       });
   
@@ -71,32 +72,6 @@ describe('Protected Endpoints', function() {
           .set('Authorization', makeAuthHeader(userInvalidCreds))
           .expect(401, { error: 'Unauthorized request' });
       });
-  
-      it('responds 401 \'Unauthorized request\' when invalid password', () => {
-        const userInvalidPass = { user_name: testUsers[0].user_name, password: 'wrong!' };
-        return supertest(app)
-          .get(endpoint.path)
-          .set('Authorization', makeAuthHeader(userInvalidPass))
-          .expect(401, { error: 'Unauthorized request' });
-      });
-    });
-  });
-
-  describe('POST /api/reviews protected endpoint', () => {
-    beforeEach('insert articles', () =>
-      helpers.seedThingsTables(
-        db,
-        testUsers,
-        testThings
-      )
-    );
-
-    it('responds 401 \'Unauthorized request\' when invalid password', () => {
-      const userInvalidPass = { user_name: testUsers[0].user_name, password: 'wrong' };
-      return supertest(app)
-        .post('/api/reviews')
-        .set('Authorization', helpers.makeAuthHeader(userInvalidPass))
-        .expect(401, { error: 'Unauthorized request' });
     });
   });
 });
